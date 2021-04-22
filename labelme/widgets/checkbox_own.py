@@ -18,17 +18,19 @@ class CheckBoxSmart(QWidget):
 
         ### 用于循环创造表格的数据 ###
         themes = {
-            '风格': ['ps立体文字', '建议图文叠加', '极简', '写实', '卡通', '插画', '撞色', '立体主义', '欧普', '像素', '渐变', '波普', '极繁', '新丑风', '赛博朋克', '蒸汽波', '孟菲斯', '酸性风格', '图片合成', '正负形', '哥特', '故障风', '半透明叠加', '切面排列透镜', '错层阴影', '多重曝光', '长投影', '文字切片'],
-            '无法识别' : ['无风格', '不是海报']              
-                 }
+            '风格:': ['ps立体文字', '建议图文叠加', '极简', '写实', '卡通', '插画', '撞色', '立体主义', '欧普', '像素', '渐变', '波普', '极繁', '新丑风',
+                   '赛博朋克', '蒸汽波', '孟菲斯', '酸性风格', '图片合成', '正负形', '哥特', '故障风', '半透明叠加', '切面排列透镜', '错层阴影', '多重曝光', '长投影',
+                   '文字切片'],
+            '无法识别:': ['无风格', '不是海报']
+        }
         spotlight = {
-            '主体物来源': ['电脑合成图像', '实物照片'],
-            '主体物类别': ['字体','几何图形','人像','其他动物','植物','工艺品','工业品','食物','衣物鞋靴','风景','其他']
+            '主体物来源:': ['电脑合成图像', '实物照片'],
+            '主体物类别:': ['字体', '几何图形', '人像', '其他动物', '植物', '工艺品', '工业品', '食物', '衣物鞋靴', '风景', '其他']
         }
         list_names = ['风格', '主体物']
         list_name_data = [themes, spotlight]
 
-        divisor = 6
+        divisor = 5
 
         self.the_window = QVBoxLayout()
         self.setLayout(self.the_window)
@@ -40,16 +42,21 @@ class CheckBoxSmart(QWidget):
         line_shape2 = '-----------------------------------------------------------------------' \
                       '-----------------------------------------------------------------------'
         for categories in list_name_data:
+            
+            self.the_window.addStretch(2)
+            
             self.label_catagory_line = QLabel(line_shape)
             self.label_catagory_line2 = QLabel(line_shape2)
             self.label_catagory = QLabel('[ ' + list_names[name_index] + ' ]')
             self.the_window.addWidget(self.label_catagory_line)
             self.the_window.addWidget(self.label_catagory)
+            self.the_window.addStretch(2)
 
             self.temp_dic_storage = {}
 
             for keys in categories:
 
+                self.the_window.addStretch(1)
                 self.label_key = QLabel(keys)
 
 
@@ -75,6 +82,7 @@ class CheckBoxSmart(QWidget):
                     j = 0
                     self.partial_layout_math_controlled = QHBoxLayout()
                     if i == 0:
+                        self.the_window.addStretch(2)
                         self.partial_layout_math_controlled.addWidget(self.label_key)
                     self.partial_layout_math_controlled.addStretch(1)
 
