@@ -838,6 +838,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setDirty()
         self.update()  ### seems none essential
 
+    def theme_signal_received(self, is_og):
+        print('received')
+        if is_og:
+            self.setClean()
+            print('hello, og')
+        elif not is_og and self.filename != None:
+            self.setDirty()
+
     ####################################################################
 
     def noShapes(self):
@@ -1650,9 +1658,12 @@ class MainWindow(QtWidgets.QMainWindow):
             )
             self.otherData = self.labelFile.otherData
             self.themes = self.labelFile.themes
+
             self.theme_widget.reSet()
             self.theme_widget.update_boxes(self.themes)
+            self.theme_widget.set_original(self.themes)
             self.theme_widget.Themes = self.theme_widget.read_boxes()
+
 
         else:
             self.theme_widget.reSet()
@@ -2206,10 +2217,3 @@ class MainWindow(QtWidgets.QMainWindow):
                     images.append(relativePath)
         images.sort(key=lambda x: x.lower())
         return images
-
-#################################
-    def theme_signal_received(self, fuckmyshitup):
-        if fuckmyshitup:
-            self.setDirty()
-        else:
-            self.setClean()
