@@ -1,34 +1,61 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QCheckBox, QApplication, QPushButton, QMessageBox, QLabel, \
-    QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QCheckBox, QApplication, QPushButton, QMessageBox, QComboBox, QLabel, QLineEdit, \
+    QHBoxLayout, QGridLayout, QVBoxLayout
+from PyQt5.QtCore import Qt, QCoreApplication, pyqtSignal
 
 import sys
 
+
 class CheckBoxSmart(QWidget):
     Signal_OneParameter = pyqtSignal(bool)
+
     def __init__(self):
         super().__init__()
         self.checkbox_storage = {}
         self.checkbox_storage_with_themes = {}
+        self.line_edit_storage = {'其他': ['', '']}
+
         self.set_up_boxes()
+        self.output_dic_og = self.read_boxes()
+        self.line_dic_og = self.line_edit_storage['其他'][1]
+        self.set_uncheckable(False)
         self.show()
-        self.Themes = self.read_boxes()
-        self.Data = None
+
     def set_up_boxes(self):
 
         ### 用于循环创造表格的数据 ###
+        ### 用于循环创造表格的数据 ###
         themes = {
             '风格:': ['ps立体文字', '建议图文叠加', '极简', '写实', '卡通', '插画', '撞色', '立体主义', '欧普', '像素', '渐变', '波普', '极繁', '新丑风',
-                   '赛博朋克', '蒸汽波', '孟菲斯', '酸性风格', '图片合成', '正负形', '哥特', '故障风', '半透明叠加', '切面排列透镜', '错层阴影', '多重曝光', '长投影',
-                   '文字切片'],
+                    '赛博朋克', '蒸汽波', '孟菲斯', '酸性风格', '图片合成', '正负形', '哥特', '故障风', '半透明叠加', '切面排列透镜', '错层阴影', '多重曝光', '长投影',
+                    '文字切片'],
             '无法识别:': ['无风格', '不是海报']
         }
         spotlight = {
             '主体物来源:': ['电脑合成图像', '实物照片'],
-            '主体物类别:': ['字体', '几何图形', '人像', '其他动物', '植物', '工艺品', '工业品', '食物', '衣物鞋靴', '风景', '其他']
+            '主体物类别:': ['字体', '几何图形', '人像', '其他动物', '植物', '工艺品', '工业品', '食物', '衣物鞋靴', '风景', '其它']
         }
-        list_names = ['风格', '主体物']
-        list_name_data = [themes, spotlight]
+
+        others = {'其他': ['其他']}
+
+        list_names = ['风格', '主体物', '其他']
+        list_name_data = [themes, spotlight, others]
+
+        """### previous data
+        themes = {'商业': ['具体商品活动', '品牌活动', '场所活动'],
+                  '非商业': ['知识宣传', '活动宣传']}
+        location = {'线上': ['商场', '超市', '线下屏幕', '交通办公场所', '餐饮娱乐产所和社区'],
+                    '线下': ['公司/品牌官网', '购物网站', '社交/娱乐网站', '社交软件']}
+        elements = {'偏向构成要素': ['极简-强功能指向', '极简-简约', '超写实', 'MBE插画', '立体主义', '低面建模', '欧普', '极繁', '像素'],
+                    '偏向色彩': ['波普', '赛博朋克', '蒸汽波'],
+                    '二者都有': ['哥特', '孟菲斯', '蒸汽朋克']}
+        culture = {'时间': ['现代', '古风'],
+                   '节日': ['春', '夏', '秋', '冬'],
+                   '艺术类型': ['雕塑', '国画写意', '国画工笔', '篆刻', '书法', '其他工艺品']}
+        others = {'其他': ['其他']}
+
+        list_names = ['主题', '地点', '构成元素', '文化元素', '其他']
+
+        list_name_data = [themes, location, elements, culture, others]"""
 
         divisor = 5
 
@@ -37,28 +64,28 @@ class CheckBoxSmart(QWidget):
 
         name_index = 0
 
-        line_shape = '-----------------------------------------------------------------------' \
-                     '-----------------------------------------------------------------------'
-        line_shape2 = '-----------------------------------------------------------------------' \
-                      '-----------------------------------------------------------------------'
         for categories in list_name_data:
-            
+
             self.the_window.addStretch(2)
-            
+
+            line_shape = '-----------------------------------------------------------------------(' \
+                         '0.0)/`----------------------------------------------------------------------- '
+            line_shape2 = '------------------------------------------------------------------------------------------' \
+                          '------------------------------------------------------------ '
             self.label_catagory_line = QLabel(line_shape)
-            self.label_catagory_line2 = QLabel(line_shape2)
             self.label_catagory = QLabel('[ ' + list_names[name_index] + ' ]')
+            self.label_catagory_line2 = QLabel(line_shape2)
+
             self.the_window.addWidget(self.label_catagory_line)
             self.the_window.addWidget(self.label_catagory)
+
             self.the_window.addStretch(2)
 
             self.temp_dic_storage = {}
 
             for keys in categories:
 
-                self.the_window.addStretch(1)
                 self.label_key = QLabel(keys)
-
 
                 local_list = categories[keys]
                 len_ = 0
@@ -66,14 +93,13 @@ class CheckBoxSmart(QWidget):
                 # find out the length of a subject manually:
                 for items in local_list:
                     len_ += 1
+                # print(len_)
 
                 # determining how many loops:
                 num_loops = int(len_ / divisor)
 
                 if len_ % divisor != 0:
                     num_loops += 1
-
-
 
                 # the giant loop for creating checkboxes
                 index_for_atoms = 0
@@ -86,52 +112,116 @@ class CheckBoxSmart(QWidget):
                         self.partial_layout_math_controlled.addWidget(self.label_key)
                     self.partial_layout_math_controlled.addStretch(1)
 
-                    while j <  divisor and index_for_atoms < len_:
+                    while j < divisor and index_for_atoms < len_:
+                        print('looop', index_for_atoms, j, categories[keys][index_for_atoms])
+
                         self.tep_checkbox = QCheckBox()
                         self.tep_checkbox.setCheckState(False)
                         self.tep_checkbox.setText(categories[keys][index_for_atoms])
+
                         self.tep_checkbox.clicked.connect(self.clicked)
+
                         self.partial_layout_math_controlled.addWidget(self.tep_checkbox)
+
                         self.checkbox_storage[self.tep_checkbox.text()] = self.tep_checkbox
                         self.temp_dic_storage[self.tep_checkbox.text()] = self.tep_checkbox
+
+                        if keys == '其他':  # or  categories[keys][index_for_atoms] == '节日':
+
+                            self.temp_text_edit = QLineEdit()
+                            self.temp_text_edit.setObjectName(keys)
+                            self.temp_text_edit.setPlaceholderText('input ' + keys + ' descriptions')
+
+                            self.temp_text_edit.textChanged.connect(self.text_changed)
+
+                            self.the_window.addWidget(self.temp_text_edit)
+                            self.line_edit_storage[keys] = [self.temp_text_edit, '']
+
+                            # self.line_edit_storage[self.temp_text_edit.objectName()] = [self.temp_text_edit, '']
+                            self.temp_text_edit.setDisabled(True)
+
                         index_for_atoms += 1
                         j += 1
-                #self.partial_layout.addStretch(1)
+
+                    # self.partial_layout.addStretch(1)
                     self.partial_layout_math_controlled.addStretch(1.8)
-                #self.the_window.addLayout(self.partial_layout)
+                    # self.the_window.addLayout(self.partial_layout)
                     self.the_window.addLayout(self.partial_layout_math_controlled)
 
             self.checkbox_storage_with_themes[list_names[name_index]] = self.temp_dic_storage
+
+            # self.the_window.addWidget(self.label_catagory_line2)  some decorations...
+
             name_index += 1
-        self.the_window.addWidget(self.label_catagory_line2)
 
         '''self.submit_button = QPushButton()
         self.submit_button.setText('Submit Selections & save')
         self.submit_button.clicked.connect(self.read_boxes)
         self.the_window.addWidget(self.submit_button)'''
 
+    def text_changed(self):
+        self.line_edit_storage[self.sender().objectName()][1] = self.sender().text()
+        self.emit_signal()
+        print(self.line_edit_storage)
+
     def emit_signal(self):
-        for categories in self.checkbox_storage_with_themes:
-            for keys in self.checkbox_storage_with_themes[categories]:
-                if ((keys not in self.Themes[categories]) and self.checkbox_storage_with_themes[categories][keys].isChecked()) or\
-                        ((keys in self.Themes[categories]) and not self.checkbox_storage_with_themes[categories][keys].isChecked()):
-                    self.Signal_OneParameter.emit(True)
-                    return
-                else:
-                    self.Signal_OneParameter.emit(False)
+        is_original = (self.output_dic_og == self.read_boxes())
+        print('is_original = ', is_original, '::', self.line_dic_og, '==?', self.line_edit_storage['其他'][1])
+        self.Signal_OneParameter.emit(is_original)
 
     def clicked(self):
         sender = self.sender().text()
         checkstate = self.checkbox_storage[sender].isChecked()
         self.emit_signal()
-        print(sender, checkstate)
+        # print(sender, checkstate)
+        if sender in self.line_edit_storage:
+            self.line_edit_storage[sender][0].setDisabled(not checkstate)
+
+    def update_boxes(self, data_set_in):
+        data_set = data_set_in[0]
+        for catagories in data_set:
+            for items in data_set[catagories]:
+                self.checkbox_storage_with_themes[catagories][items].setCheckState(Qt.Checked)
+                if items == '其他':
+                    self.line_edit_storage[items][0].setDisabled(
+                        not self.checkbox_storage_with_themes[catagories][items].isChecked())
+                    print('set line check, ', self.checkbox_storage_with_themes[catagories][items].isChecked())
+
+        ### update the line box
+        line_text = data_set_in[1]['其他']
+        if line_text != '':
+            self.checkbox_storage_with_themes['其他']['其他'].setDisabled(False)
+        self.line_edit_storage['其他'][1] = line_text
+        self.line_edit_storage['其他'][0].setText(line_text)
+
+    def reSet(self):
+        for catagories in self.checkbox_storage_with_themes:
+            for keys in self.checkbox_storage_with_themes[catagories]:
+                self.checkbox_storage_with_themes[catagories][keys].setCheckState(Qt.Unchecked)
+                if keys == '其他':
+                    self.line_edit_storage[keys][0].setDisabled(True)
+                ## 每次load File清零时将其他输入框也变灰, 后面如果其他被check
+
+        ### reset the line box
+        self.line_edit_storage['其他'][1] = ''
+        self.line_edit_storage['其他'][0].setText('')
+
+        # cbox = QCheckBox()
+        # cbox.setDisabled()
+
+    def set_uncheckable(self, boool):
+        for catagories in self.checkbox_storage_with_themes:
+            for keys in self.checkbox_storage_with_themes[catagories]:
+                self.checkbox_storage_with_themes[catagories][keys].setDisabled(boool)
 
     def read_boxes(self):
+        # print('reading checked_boxes:')
         output_dic = {}
         str_checked = ''
         for categories in self.checkbox_storage_with_themes:
             str_checked += categories
             str_checked += ': '
+            # print(self.checkbox_storage_with_themes[categories])
             temp_keys_under_catagories = []
             for keys in self.checkbox_storage_with_themes[categories]:
 
@@ -141,33 +231,23 @@ class CheckBoxSmart(QWidget):
 
             output_dic[categories] = temp_keys_under_catagories
             str_checked += ' \n'
-        return output_dic
 
-    '''def changed(self, CheckBoxSmart):
-        for categories in self.checkbox_storage_with_themes:
-            for keys in self.checkbox_storage_with_themes[categories]:
-                if self.Themes[categories][keys] != self.Data[categories][keys]:
-                    return True
-        return False'''
+        # QMessageBox.about(self, '提交:', ' 您成果将这张图片归类为:\n\n' + str(str_checked))
+        # print('internal storage:', self.checkbox_storage_with_themes)
+        return [output_dic, {'其他': self.line_edit_storage['其他'][1]}]
 
-    def update_boxes(self, data_set):
-        self.Data=data_set
-        for catagories in data_set:
-            for items in data_set[catagories]:
-                self.checkbox_storage_with_themes[catagories][items].setCheckState(Qt.Checked)
+    def set_original(self, dict_og):
+        print('og set')
+        self.output_dic_og = dict_og
 
-    def reSet(self):
-        for catagories in self.checkbox_storage_with_themes:
-            for keys in self.checkbox_storage_with_themes[catagories]:
-                self.checkbox_storage_with_themes[catagories][keys].setCheckState(Qt.Unchecked)
+    def __str__(self):
+        return_data = self.read_boxes()
+        # print('return_data = :', return_data)
+        return return_data
 
-    def set_uncheckable(self, bool_state):
-        for catagories in self.checkbox_storage_with_themes:
-            for keys in self.checkbox_storage_with_themes[catagories]:
-                self.checkbox_storage_with_themes[catagories][keys].setDisabled(bool_state)
 
 if __name__ == '__main__':
-    application = QApplication(sys.argv)
+    app = QApplication(sys.argv)
     ex = CheckBoxSmart()
     ex.show()
-    sys.exit(application.exec_())
+    sys.exit(app.exec_())
